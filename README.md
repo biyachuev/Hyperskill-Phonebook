@@ -1,27 +1,30 @@
 # Hyperskill-Phonebook
 Hyperskill learning project
-
 Description
 
-Have you ever had to use one of those 2000+ page phone books full of various organizations and people's names, written in a small font and with multiple columns on each page? Finding the information you need in such books can be an ordeal. In fact, even computers struggle to search through the millions of entries in a directory.
+The search is pretty fast, but is it possible to come up with something even faster?
 
-In this project, you will create a phone book, implementing several algorithms and comparing their efficiency when using a big dataset.
+In the previous stage, you prepared the data using an algorithm with a complexity of O(n log n) and found the data using an algorithm with a complexity of O(log n). At this stage, you will implement faster data preparation and a faster search. The preparation will have a complexity of O(n), and the search will have a complexity of O(1). A hash table will help you with this.
 
-For this, you will need to download a file that contains the phone numbers of over a million people in multiple cities.
-
-At this stage, you should implement the simplest search you can to find the numbers of a few people whose names are listed in our .txt file.
-
-Note how long it takes you to do this when using a linear search so that you can compare results with other search methods.
-
-To measure the time difference, you can use System.currentTimeMillis().
-
-Also notice that you don't need to read the file "directory.txt" again and again after each query. You should load all lines into memory and measure only the search process.
-
-Please, do not keep the downloaded files inside your project directory because the server may reject large files and you will see the message "Failed to post submission to the Hyperskill".
-
+You need to add all the elements to the hash table and then find the necessary phone numbers, as in the previous stages. Since the hash table is filled once, you need to measure the hash table creation time separately (just like you did with sorting in the previous stage).
 Example
 
-Below is an example of how your output should look:
+Output all four approaches one after another and see which one is faster. The output example is shown below. Note that you can get totally different sorting and searching times!
 
-Start searching...
+Start searching (linear search)...
 Found 500 / 500 entries. Time taken: 1 min. 56 sec. 328 ms.
+
+Start searching (bubble sort + jump search)...
+Found 500 / 500 entries. Time taken: 9 min. 15 sec. 291 ms.
+Sorting time: 8 min. 45 sec. 251 ms.
+Searching time: 0 min. 30 sec. 40 ms.
+
+Start searching (quick sort + binary search)...
+Found 500 / 500 entries. Time taken: 1 min. 21 sec. 996 ms.
+Sorting time: 1 min. 17 sec. 381 ms.
+Searching time: 0 min. 4 sec. 615 ms.
+
+Start searching (hash table)...
+Found 500 / 500 entries. Time taken: 0 min. 4 sec. 256 ms.
+Creating time: 0 min. 4 sec. 121 ms.
+Searching time: 0 min. 0 sec. 135 ms.
