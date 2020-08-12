@@ -1,0 +1,14 @@
+Aug 12, 2020 9:27:37 PM PhoneBook search
+INFO: Both files downloaded in 00 min. 00 sec. 186 ms.
+Aug 12, 2020 9:27:37 PM PhoneBook search
+INFO: Directory size = 101413
+Aug 12, 2020 9:27:37 PM PhoneBook search
+INFO: Search list size = 500
+Aug 12, 2020 9:28:11 PM PhoneBook bubbleSort
+INFO: first element of sorted directory = 91597530 Abbe Heidy
+Aug 12, 2020 9:28:11 PM PhoneBook bubbleSort
+INFO: last element of sorted directory = 54202511 the
+Aug 12, 2020 9:28:15 PM PhoneBook quickSort
+INFO: first element of sorted directory = 78419779 Aaren Akers
+Aug 12, 2020 9:28:15 PM PhoneBook quickSort
+INFO: last element of sorted directory = 54202511 the
