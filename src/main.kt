@@ -1,4 +1,6 @@
 import java.io.File
+import java.math.BigInteger
+import java.security.MessageDigest
 import java.util.logging.*
 import kotlin.math.*
 import kotlin.random.Random
@@ -12,13 +14,13 @@ fun MutableList<String>.swap(index1: Int, index2: Int) {
 object PhoneBook {
     private val directory = mutableListOf<String>()
     private val searchNames = mutableListOf<String>()
+    private val dirHash = hashMapOf<String, String>()
+    private var hashf = ::hashdjb2          // used to experiment with different hashing functions
+
     private val logger = Logger.getLogger(PhoneBook::class.qualifiedName)
     private val fileHandler = FileHandler("phonebook.log")
     var directoryFileName = ""
     var searchNamesFileName = ""
-
-//    var pivot: String = ""
-//    var i: Int = 0
 
     private var t0: Long = 0
     private var t1: Long = 0
@@ -109,6 +111,7 @@ object PhoneBook {
         Result.timeLimitExceeded = false
     }
 
+    // https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
     private fun qsortLomuto(left: Int, right: Int) {
         if (left < right) {
             var i = left
@@ -130,8 +133,8 @@ object PhoneBook {
         Result.text = "Sorting time: ${duration(t1 - t0)}"
         Result.duration = t1 - t0
 
-        logger.info("first element of sorted directory = ${directory[0]}")
-        logger.info("last element of sorted directory = ${directory[directory.lastIndex]}")
+        logger.info("qSort: first element of sorted directory = ${directory[0]}")
+        logger.info("qSort: last element of sorted directory = ${directory[directory.lastIndex]}")
 //        for (i in directory) logger.info("directory[element]: $i")
     }
 
@@ -155,9 +158,58 @@ object PhoneBook {
         Result.text = "Sorting time: ${duration(t1 - t0)}"
         Result.duration = t1 - t0
 
-        logger.info("first element of sorted directory = ${directory[0]}")
-        logger.info("last element of sorted directory = ${directory[directory.lastIndex]}")
+        logger.info("bubble sort: first element of sorted directory = ${directory[0]}")
+        logger.info("bubble sort: last element of sorted directory = ${directory[directory.lastIndex]}")
 //        for (i in directory) logger.info("directory[element]: $i")
+    }
+
+    fun hashMD5(el: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        return BigInteger(1, md.digest(el.toByteArray(Charsets.UTF_8))).toString(16).padStart(32, '0')
+    }
+
+    // https://cp-algorithms.com/string/string-hashing.html
+    fun hashPolynomial(el: String): String {
+        val p = 53
+        val m: Long = (1e9 + 9).toLong()
+        var hash: Long = 0
+        var pow: Long = 1
+        for (i in el) {
+            hash = (hash + (i - 'a' + 1) * pow) % m
+            pow = (pow * p) % m
+        }
+        return hash.toString()
+    }
+
+    // https://en.wikipedia.org/wiki/Universal_hashing#Hashing_strings
+    fun hashdjb2(el: String): String {
+        var hash: Long = 5381
+        for (i in el) hash = hash * 33 + (i - 'a' + 1)
+        return hash.toString()
+    }
+
+    private fun hashtableCreation() {
+        Result.clear()
+        t0 = System.currentTimeMillis()
+
+        for (el in directory) dirHash[hashf(el.substringAfter(' '))] = el.substringBefore(' ')
+
+        t1 = System.currentTimeMillis()
+        Result.text = "Creating time: ${duration(t1 - t0)}"
+        Result.duration = t1 - t0
+    }
+
+    private fun hashSearch() {
+        Result.clear()
+        t0 = System.currentTimeMillis()
+
+        for (el in searchNames) {
+            if (dirHash[hashf(el)] != null) Result.founded++
+        }
+
+        t1 = System.currentTimeMillis()
+        Result.text = "Searching time: ${duration(t1 - t0)}"
+        Result.duration = t1 - t0
     }
 
     fun search() {
@@ -176,7 +228,7 @@ object PhoneBook {
         println("Start searching (linear search)...")
         linearSearch()  // used to stop too slow bubble search
         val timeLimit = Result.duration * 10
-        println(Result.text)
+        println("${Result.text} \n")
 
         println("Start searching (bubble sort + jump search)...")
         bubbleSort(timeLimit)
@@ -192,7 +244,7 @@ object PhoneBook {
         }
         totalDuration += Result.duration
         println("Found ${Result.founded} / ${searchNames.size} entries. Time taken: ${duration(totalDuration)}")
-        println(temp)
+        println("$temp \n")
 
         directory.clear()
         File(directoryFileName).forEachLine { directory.add(it.trim()) }
@@ -202,6 +254,17 @@ object PhoneBook {
         totalDuration = Result.duration
         temp = Result.text + "\n"
         binarySearch()
+        temp += "Searching time: ${duration(Result.duration)}"
+        totalDuration += Result.duration
+        println("Found ${Result.founded} / ${searchNames.size} entries. Time taken: ${duration(totalDuration)}")
+        println("$temp \n")
+
+        println("Start searching (hash table)...")
+        if (Random.nextInt(1) == 0) hashf = ::hashdjb2 else hashf =::hashPolynomial // for fun
+        hashtableCreation()
+        totalDuration = Result.duration
+        temp = Result.text + "\n"
+        hashSearch()
         temp += "Searching time: ${duration(Result.duration)}"
         totalDuration += Result.duration
         println("Found ${Result.founded} / ${searchNames.size} entries. Time taken: ${duration(totalDuration)}")
@@ -230,7 +293,7 @@ object PhoneBook {
 }
 
 fun main() {
-    PhoneBook.directoryFileName = "/Users/biyachuev/Documents/Projects_Kotlin/Hyperskill_Phonebook_hard/inputData/directory.txt"
+    PhoneBook.directoryFileName = "/Users/biyachuev/Documents/Projects_Kotlin/Hyperskill_Phonebook_hard/inputData/directory10.txt"
     PhoneBook.searchNamesFileName = "/Users/biyachuev/Documents/Projects_Kotlin/Hyperskill_Phonebook_hard/inputData/find.txt"
     PhoneBook.search()
 //    PhoneBook.generateTestSets(5, -1)
